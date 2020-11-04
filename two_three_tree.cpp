@@ -39,7 +39,7 @@ void ttt::Two_thee_tree::insert(int key)
     }
 
     // Insert element
-    auto elem_new = std::shared_ptr<ttt::Node>(new ttt::Node(key,x->parent));
+    auto elem_new = std::shared_ptr<ttt::Node>(new ttt::Node(key,parent));
     // Make child list correct
     // If there is only two childs
     if (parent->childs.size() == 2)
@@ -97,7 +97,7 @@ void ttt::Two_thee_tree::insert(int key)
         // Find place to past new elems
         auto child_place =
                 std::find(grandpa->childs.begin(),grandpa->childs.end(),parent);
-        if (child_place == grandpa->childs.end() )
+        if (child_place == grandpa->childs.end())
             std::cout << "ALERT\n";
 
         // Past new childs

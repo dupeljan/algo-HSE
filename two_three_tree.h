@@ -56,6 +56,7 @@ struct Node
     is_null(is_null_)
     {}
 
+
     /*
      * Recalculate child max
      * when one node is separated
@@ -64,13 +65,14 @@ struct Node
     bool update_child_max()
     {
         auto childs_max_old = child_max;
-        child_max.clear();
         // If child is a leaf
         auto value = (!childs[0]->childs.size())?
-                    [](Node x ) -> int {return x.key;} : // just save key
+                    [](Node x) -> int {return x.key;} : // just save key
                     ///ERROR HERE
-                    [](Node x ) -> int {return *std::max_element(x.child_max.begin(),x.child_max.end());}; // else save the max of child_max list
+                    [](Node x) -> int {
+            return *std::max_element(x.child_max.begin(),x.child_max.end());}; // else save the max of child_max list
 
+        child_max.clear();
         for(auto &ch : childs)
             child_max.push_back(value(*ch.get()));
 
@@ -79,10 +81,11 @@ struct Node
 
     void change_childs(std::vector<std::shared_ptr<Node>>&& childs_)
     {
-        childs = childs_;
+        childs.clear();
         auto ref = std::shared_ptr<Node>(this);
-        for(auto &ch : childs)
+        for(auto &ch : childs_)
         {
+            childs.push_back(std::shared_ptr<Node>(ch));
             ch->parent = ref;
         }
     }
