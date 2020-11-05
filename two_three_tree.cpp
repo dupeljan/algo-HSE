@@ -101,8 +101,7 @@ void ttt::Two_thee_tree::insert(int key)
             std::cout << "ALERT\n";
 
         // Past new childs
-        // grandpa->childs.erase(child_place); 
-        // ^ Possible iterator invalidation.
+        child_place =  grandpa->childs.erase(child_place);
         auto child_new = std::vector<std::shared_ptr<ttt::Node>>({left_node,right_node});
         grandpa->childs.insert(child_place,child_new.begin(),child_new.end());
 
@@ -128,10 +127,10 @@ std::shared_ptr<ttt::Node> ttt::Two_thee_tree::search(int key)
    while(x->childs.size())
    {
        if(x->childs.size() == 2)
-           x = (key < x->child_max[0])? x->childs[0] : x->childs[1];
+           x = (key <= x->child_max[0])? x->childs[0] : x->childs[1];
        else // x child size == 3
-           x = (key < x->child_max[0])? x->childs[0] :
-               ( (key < x->child_max[1])? x->childs[1] : x->childs[2] );
+           x = (key <= x->child_max[0])? x->childs[0] :
+               ( (key <= x->child_max[1])? x->childs[1] : x->childs[2] );
    }
 
    // Return null if key is not equal
