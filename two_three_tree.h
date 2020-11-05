@@ -8,9 +8,9 @@
 #include <algorithm>
 #include <utility>
 
-namespace ttt{
+namespace ttt {
 
-struct Node
+struct Node: std::enable_shared_from_this<Node>
 {
     int key; // Node key
     std::vector<int> child_max; // Maximum element key in child subtree
@@ -82,7 +82,7 @@ struct Node
     void change_childs(std::vector<std::shared_ptr<Node>>&& childs_)
     {
         childs.clear();
-        auto ref = std::shared_ptr<Node>(this);
+        auto ref = shared_from_this();
         for(auto &ch : childs_)
         {
             childs.push_back(std::shared_ptr<Node>(ch));

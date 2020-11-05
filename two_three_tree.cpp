@@ -101,7 +101,8 @@ void ttt::Two_thee_tree::insert(int key)
             std::cout << "ALERT\n";
 
         // Past new childs
-        grandpa->childs.erase(child_place);
+        // grandpa->childs.erase(child_place); 
+        // ^ Possible iterator invalidation.
         auto child_new = std::vector<std::shared_ptr<ttt::Node>>({left_node,right_node});
         grandpa->childs.insert(child_place,child_new.begin(),child_new.end());
 
