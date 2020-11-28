@@ -95,15 +95,15 @@ void ttt::Two_thee_tree::insert(int key)
         left_node->parent = grandpa;
         right_node->parent = grandpa;
         // Find place to past new elems
-        auto child_place =
+        const auto child_place =
                 std::find(grandpa->childs.begin(),grandpa->childs.end(),parent);
         if (child_place == grandpa->childs.end())
             std::cout << "ALERT\n";
 
         // Past new childs
-        child_place =  grandpa->childs.erase(child_place);
-        auto child_new = std::vector<std::shared_ptr<ttt::Node>>({left_node,right_node});
-        grandpa->childs.insert(child_place,child_new.begin(),child_new.end());
+        const auto child_place_insert =  grandpa->childs.erase(child_place);
+        const auto child_new = std::vector<std::shared_ptr<ttt::Node>>({left_node,right_node});
+        grandpa->childs.insert(child_place_insert,child_new.begin(),child_new.end());
 
         // Update max child
         grandpa->update_child_max();
