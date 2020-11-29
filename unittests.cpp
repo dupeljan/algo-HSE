@@ -103,6 +103,9 @@ TEST(TTTtreeTest, remove_test)
         for(auto &x : v1)
             tree.insert(x);
         std::random_shuffle(v1.begin(),v1.end());
+        for(auto &x : v1)
+            EXPECT_EQ(tree.search(x)->key,x);
+        std::random_shuffle(v1.begin(),v1.end());
         for(auto &x: v1)
             tree.remove(x);
         canonic_tree_test(tree);
@@ -117,9 +120,6 @@ TEST(QuicksortTest, sort_test)
     const int max = 50000;
     const int min = -50000;
 
-    std::vector<int> x = {1,1};
-    std::swap(x[0],x[1]);
-
     for(int i = 0; i < 100; i++)
     {
         std::vector<int> v(10000);
@@ -130,9 +130,8 @@ TEST(QuicksortTest, sort_test)
         quick_sort(v);
         EXPECT_EQ(std::is_sorted(v.begin(),v.end()),true) ;
     }
-
-
 }
+
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
