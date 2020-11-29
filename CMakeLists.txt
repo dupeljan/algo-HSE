@@ -12,7 +12,6 @@ add_executable(${PROJECT_NAME}
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-include_directories($CMAKE_CURRENT_BINARY_DIR)
 ## Add Gtest
 enable_testing()
 add_executable(runUnitTests

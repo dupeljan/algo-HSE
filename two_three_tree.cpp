@@ -44,26 +44,99 @@ void ttt::Two_thee_tree::insert(int key)
     }
 
     // Insert element
-    auto elem_new = std::shared_ptr<ttt::Node>(new ttt::Node(key,parent));
+    auto elem_new = std::shared_ptr<ttt::Node>(new ttt::Node(key));
     // Make child list correct
-    // If there is only two childs
-    if (parent->childs.size() == 2)
-    {
-        // Just add another one and return
-        int child_place = (key < parent->childs[0]->key)? 0
-                                    : ((key < parent->childs[1]->key)? 1 : 2);
-        parent->childs.insert(parent->childs.begin() + child_place, elem_new);
-        // Update children max
-        //parent->child_max.insert(parent->child_max.begin()+child_place, key);
+    add_and_balance(parent,elem_new);
 
-        update_childs_max(elem_new);
+}
+
+/*
+ * Remove element from tree
+ * by given key value
+ * params:
+ *          key - given key value
+ */
+void ttt::Two_thee_tree::remove(int key)
+{
+    // Find node to remove
+    auto t = search(key);
+
+    // If it doesn't exist
+    if(t == nullptr || t->is_null)
+    {
+        //std::cout << "Attempt to remove elem which doesn't exist\n";
         return;
     }
 
-    // If there is thee childs - Balance the tree
-    // Add fourth node
-    add_and_balance(parent,elem_new);
+    // If it has no parent ->
+    // It's the root node
+    auto parent = t->parent;
+    if(parent == nullptr)
+    {
+        // Expect automated memory alloc
+        root = nullptr;
+        return;
+    }
 
+    // If p has three sons ->
+    // just remove one of them
+    if(parent->childs.size() == 3)
+    {
+        // Remove t from childs vector
+        parent->childs.erase(std::remove(parent->childs.begin(),parent->childs.end(),t)
+                                                                      ,parent->childs.end());
+        // Remove t from child_max vector
+        parent->child_max.erase(std::remove(parent->child_max.begin(),parent->child_max.end(),t->key)
+                                ,parent->child_max.end());
+        // Recalculate child_max recursevly
+        update_childs_max(parent);
+
+        return;
+    }
+
+    // Thus parent have two child nodes
+
+
+    auto g_parent = parent->parent;
+    auto node = find_nearest_brother(t);
+    // If parent is root
+    // Then remained node is root
+    if(g_parent == nullptr)
+    {
+        root = node;
+        node->parent = nullptr;
+        return;
+    }
+    // While parent node has only one child and it's
+    // not the tree root
+    do
+    {
+        // Find closest neighbor of parent
+        auto parent_new = find_nearest_brother(parent);
+        // remove it from g_parent
+        g_parent->childs.erase(std::remove(g_parent->childs.begin(),
+                                            g_parent->childs.end(),
+                                            parent),
+                                g_parent->childs.end());
+        // Connect node to new parent
+        if(node->childs.size())
+            node->key = node->child_max.back();
+        add_and_balance(parent_new,node);
+
+        // Iterate
+        node = parent_new;
+        parent = g_parent;
+        g_parent = g_parent->parent;
+
+    }while(g_parent != nullptr && parent->childs.size() == 1);
+    // If root have only one child
+    // his child become root
+    if (g_parent == nullptr && parent->childs.size() == 1)
+    {
+        // Swap root and parent node
+        node->parent = nullptr;
+        root = node;
+    }
 }
 
 /*
@@ -76,6 +149,9 @@ void ttt::Two_thee_tree::insert(int key)
  */
 std::shared_ptr<ttt::Node> ttt::Two_thee_tree::search(int key)
 {
+    if (root == nullptr)
+        return nullptr;
+
    // If root is a list
    if (!root->childs.size())
        return (root->key == key)? root : std::shared_ptr<Node>(new Node(root, true));
@@ -122,11 +198,28 @@ void ttt::Two_thee_tree::update_childs_max(const std::shared_ptr<Node> node)
 void ttt::Two_thee_tree::add_and_balance(const std::shared_ptr<ttt::Node> parent_p,const std::shared_ptr<ttt::Node> node)
 {
     auto parent = parent_p;
-    // Find palce and add element
     auto key = node->key;
-    int child_place = (key < parent->childs[0]->key)? 0
-                               : ((key < parent->childs[1]->key)? 1
-                                   : (((key < parent->childs[2]->key)? 2 : 3)));
+
+    // Setup parents relation
+    node->parent = parent_p;
+    // If there is only two childs
+    if (parent->childs.size() == 2)
+    {
+        // Just add another one and return
+        int child_place = (key < parent->child_max[0])? 0
+                                    : ((key < parent->child_max[1])? 1 : 2);
+        parent->childs.insert(parent->childs.begin() + child_place, node);
+        // Update children max
+        //parent->child_max.insert(parent->child_max.begin()+child_place, key);
+
+        update_childs_max(node);
+        return;
+    }
+
+    // Find palce and add element
+    int child_place = (key < parent->child_max[0])? 0
+                               : ((key < parent->child_max[1])? 1
+                                   : (((key < parent->child_max[2])? 2 : 3)));
 
     parent->childs.insert(parent->childs.begin() + child_place, node);
     parent->child_max.insert(parent->child_max.begin()+child_place, key);
@@ -182,6 +275,34 @@ void ttt::Two_thee_tree::add_and_balance(const std::shared_ptr<ttt::Node> parent
 
     // Update max child for all nodes to the root
     update_childs_max(parent);
+}
+
+/*
+ * Return node
+ * which is closest neighbor
+ * of given node
+ * params:
+ *          node - given node
+ * return:
+ *          closets neighbor of given node
+ */
+std::shared_ptr<ttt::Node> ttt::Two_thee_tree::find_nearest_brother(std::shared_ptr<ttt::Node> node)
+{
+    // If parent is most left node for grand parent ->
+    //            closest brother is in the right
+    // If parent is most right node for grand parent ->
+    //            closest brother is in the right
+    // If parent is in the middle of grand parent childs vector ->
+    //            it doesn't matter (right in our case)
+    if(node->parent == nullptr)
+        return nullptr;
+    auto node_pos = std::distance(node->parent->childs.begin(),
+        std::find(node->parent->childs.begin(),node->parent->childs.end(),
+                  node));
+    auto pos_nn = (node_pos + 1 == node->parent->childs.size())?
+                                                                       node_pos - 1:
+                                                                       node_pos + 1;
+    return node->parent->childs[pos_nn];
 }
 
 

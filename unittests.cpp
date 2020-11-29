@@ -47,6 +47,69 @@ TEST(TTTtreeTest, insert_test)
     }
 }
 
+TEST(TTTtreeTest, remove_test)
+{
+    auto tree = ttt::Two_thee_tree();
+
+    // Empty case
+    tree.remove(5);
+
+    // Only root case
+    tree.insert(5);
+    tree.remove(5);
+    tree.remove(5);
+    EXPECT_EQ(tree.root,nullptr);
+
+    // Parent has tree elelents case
+    auto canonic_tree_insert = std::vector<int>({3,2,1,4,5,6,7,8,9,-1,-2});
+    for (auto &i : canonic_tree_insert)
+        tree.insert(i);
+    tree.insert(-3);
+    tree.remove(-3);
+    canonic_tree_test(tree);
+
+    auto tree1 = ttt::Two_thee_tree();
+    tree1.insert(1);
+    tree1.insert(1);
+    tree1.insert(2);
+    tree1.remove(1);
+    EXPECT_EQ(tree1.root->key,2);
+    EXPECT_EQ(tree1.root->parent,nullptr);
+
+    tree.insert(-3);
+    for (auto &i : canonic_tree_insert)
+        tree.remove(i);
+    EXPECT_EQ(tree.root->key,-3);
+    tree.remove(-3);
+
+    // HARD TEST
+    for (auto &i : canonic_tree_insert)
+        tree.insert(i);
+    int min(10), max(10000);
+    for(int i=0; i<10; i++)
+    {
+        auto v1 = std::vector<int>(10000);
+        auto v2 = std::vector<int>(10000);
+        std::generate(v1.begin(), v1.end(),
+                      [min, max]() -> int {return std::rand() % (max - min) + min; });
+        auto tmp = max;
+        max = -min;
+        min = -tmp;
+        std::generate(v2.begin(), v2.end(),
+                      [max, min]() -> int {return std::rand() % (max - min) + min; });
+        v1.insert( v1.end(), v2.begin(), v2.end() );
+
+        std::random_shuffle(v1.begin(),v1.end());
+        for(auto &x : v1)
+            tree.insert(x);
+        std::random_shuffle(v1.begin(),v1.end());
+        for(auto &x: v1)
+            tree.remove(x);
+        canonic_tree_test(tree);
+    }
+
+}
+
 TEST(QuicksortTest, sort_test)
 {
 

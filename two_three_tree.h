@@ -7,6 +7,7 @@
 #include <iostream>
 #include <algorithm>
 #include <utility>
+#include <exception>
 
 namespace ttt {
 
@@ -57,7 +58,6 @@ struct Node: std::enable_shared_from_this<Node>
     {}
 
 
-
     bool update_child_max();
     void change_childs(std::vector<std::shared_ptr<Node>>&& childs_);
 };
@@ -76,12 +76,13 @@ public:
      }
 
      void insert(int key);
-     void delete_(int key);
+     void remove(int key);
      std::shared_ptr<Node> search(int key);
 
 private:
      void update_childs_max(const std::shared_ptr<Node> node);
      void add_and_balance(const std::shared_ptr<Node> parent_p, const std::shared_ptr<Node> node);
+     std::shared_ptr<Node> find_nearest_brother(std::shared_ptr<Node> node);
 };
 
 }
