@@ -61,24 +61,4 @@ int partitision_rand(std::vector<int> &v, int p, int r)
     return i;
 }
 
-/*
- * Test if vector is sorted from min to max value
- * params:
- *  v - vector to test
- * returns:
- *  bool - result of the test
- */
-bool is_sorted(std::vector<int> v)
-{
-    bool res = true;
-    for(auto x = v.begin(); (x+1) != v.end() && res; x++)
-    {
-        if( *x > *(x+1))
-        {
-            res = false;
-        }
-    }
-
-    return res;
-}
 #endif // QUICK_SORT_H

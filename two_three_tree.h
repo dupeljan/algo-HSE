@@ -57,65 +57,31 @@ struct Node: std::enable_shared_from_this<Node>
     {}
 
 
-    /*
-     * Recalculate child max
-     * when one node is separated
-     * on two nodes
-     */
-    bool update_child_max()
-    {
-        auto childs_max_old = child_max;
-        // If child is a leaf
-        auto value = (!childs[0]->childs.size())?
-                    [](Node x) -> int {return x.key;} : // just save key
-                    ///ERROR HERE
-                    [](Node x) -> int {
-            return *std::max_element(x.child_max.begin(),x.child_max.end());}; // else save the max of child_max list
 
-        child_max.clear();
-        for(auto &ch : childs)
-            child_max.push_back(value(*ch.get()));
-
-        return ! std::equal(child_max.begin(),child_max.end(),childs_max_old.begin(),childs_max_old.end());
-    }
-
-    void change_childs(std::vector<std::shared_ptr<Node>>&& childs_)
-    {
-        childs.clear();
-        auto ref = shared_from_this();
-        for(auto &ch : childs_)
-        {
-            childs.push_back(std::shared_ptr<Node>(ch));
-            ch->parent = ref;
-        }
-    }
+    bool update_child_max();
+    void change_childs(std::vector<std::shared_ptr<Node>>&& childs_);
 };
 
-/*
-struct search_out
-{
-    std::shared_ptr<Node> prev, cur;
-    search_out(std::shared_ptr<Node> prev_,std::shared_ptr<Node> cur_):
-    prev(prev_), cur(cur_)
-    {}
-};
-*/
 
 class Two_thee_tree
 {
-    std::shared_ptr<Node> root;
 
 public:
+
+     std::shared_ptr<Node> root;
+
      Two_thee_tree()
      {
         root = nullptr;
      }
 
      void insert(int key);
-     void _delete(int key);
+     void delete_(int key);
      std::shared_ptr<Node> search(int key);
+
 private:
-     void update_childs_max(std::shared_ptr<Node> parent);
+     void update_childs_max(const std::shared_ptr<Node> node);
+     void add_and_balance(const std::shared_ptr<Node> parent_p, const std::shared_ptr<Node> node);
 };
 
 }

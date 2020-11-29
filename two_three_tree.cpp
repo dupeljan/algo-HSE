@@ -1,8 +1,13 @@
 #include "two_three_tree.h"
 
+/*
+ * Insert element in tree with
+ * given key value
+ * params:
+ *          key - given key value
+ */
 void ttt::Two_thee_tree::insert(int key)
 {
-
     if(root == nullptr)
     {
         root = std::shared_ptr<ttt::Node>(new ttt::Node(key));
@@ -57,11 +62,73 @@ void ttt::Two_thee_tree::insert(int key)
 
     // If there is thee childs - Balance the tree
     // Add fourth node
+    add_and_balance(parent,elem_new);
+
+}
+
+/*
+ * Search by given key
+ * params:
+ *          key - given key
+ * return:
+ *          node if it's exist
+ *          or left node with params is_null == true
+ */
+std::shared_ptr<ttt::Node> ttt::Two_thee_tree::search(int key)
+{
+   // If root is a list
+   if (!root->childs.size())
+       return (root->key == key)? root : std::shared_ptr<Node>(new Node(root, true));
+   // Search most appropriate list
+   auto x = root;
+   while(x->childs.size())
+   {
+       if(x->childs.size() == 2)
+           x = (key <= x->child_max[0])? x->childs[0] : x->childs[1];
+       else // x child size == 3
+           x = (key <= x->child_max[0])? x->childs[0] :
+               ( (key <= x->child_max[1])? x->childs[1] : x->childs[2] );
+   }
+
+   // Return null if key is not equal
+   // else return x
+   if(x->key == key)
+       return x;
+   return std::shared_ptr<ttt::Node>(new Node(x,true));
+}
+
+/*
+ * Update_child_max for all nodes
+ * from parent of given node to root
+ * params:
+ *          node - given node
+ */
+void ttt::Two_thee_tree::update_childs_max(const std::shared_ptr<Node> node)
+{
+    auto parent = node;
+    do
+    {parent = parent->parent;}
+    while(parent != nullptr && parent->update_child_max());
+}
+
+/*
+ * Add node to parent node, balance tree and
+ * recompute all child_max
+ * params:
+ *          parent - node which child list appended
+ *                   by given node
+ *          node   - given node
+ */
+void ttt::Two_thee_tree::add_and_balance(const std::shared_ptr<ttt::Node> parent_p,const std::shared_ptr<ttt::Node> node)
+{
+    auto parent = parent_p;
+    // Find palce and add element
+    auto key = node->key;
     int child_place = (key < parent->childs[0]->key)? 0
                                : ((key < parent->childs[1]->key)? 1
                                    : (((key < parent->childs[2]->key)? 2 : 3)));
 
-    parent->childs.insert(parent->childs.begin() + child_place, elem_new);
+    parent->childs.insert(parent->childs.begin() + child_place, node);
     parent->child_max.insert(parent->child_max.begin()+child_place, key);
 
     // Balance it from leaf to root
@@ -117,32 +184,42 @@ void ttt::Two_thee_tree::insert(int key)
     update_childs_max(parent);
 }
 
-std::shared_ptr<ttt::Node> ttt::Two_thee_tree::search(int key)
-{
-   // If root is a list
-   if (!root->childs.size())
-       return (root->key == key)? root : std::shared_ptr<Node>(new Node(root, true));
-   // Search most appropriate list
-   auto x = root;
-   while(x->childs.size())
-   {
-       if(x->childs.size() == 2)
-           x = (key <= x->child_max[0])? x->childs[0] : x->childs[1];
-       else // x child size == 3
-           x = (key <= x->child_max[0])? x->childs[0] :
-               ( (key <= x->child_max[1])? x->childs[1] : x->childs[2] );
-   }
 
-   // Return null if key is not equal
-   // else return x
-   if(x->key == key)
-       return x;
-   return std::shared_ptr<ttt::Node>(new Node(x,true));
+/*
+ * Recalculate child max
+ * when one node is separated
+ * on two nodes
+*/
+bool ttt::Node::update_child_max()
+{
+    auto childs_max_old = child_max;
+    // If child is a leaf
+    auto value = (!childs[0]->childs.size())?
+                [](Node x) -> int {return x.key;} : // just save key
+                ///ERROR HERE
+                [](Node x) -> int {
+        return *std::max_element(x.child_max.begin(),x.child_max.end());}; // else save the max of child_max list
+
+    child_max.clear();
+    for(auto &ch : childs)
+        child_max.push_back(value(*ch.get()));
+
+    return ! std::equal(child_max.begin(),child_max.end(),childs_max_old.begin(),childs_max_old.end());
 }
 
-void ttt::Two_thee_tree::update_childs_max(std::shared_ptr<Node> parent)
+/*
+ * Swap childs list to given list
+ * without child_max recalculation
+ * params:
+ *          childs - given vector of nodes
+ */
+void ttt::Node::change_childs(std::vector<std::shared_ptr<ttt::Node> > &&childs_)
 {
-    do
-    {parent = parent->parent;}
-    while(parent != nullptr && parent->update_child_max());
+    childs.clear();
+    auto ref = shared_from_this();
+    for(auto &ch : childs_)
+    {
+        childs.push_back(std::shared_ptr<Node>(ch));
+        ch->parent = ref;
+    }
 }
