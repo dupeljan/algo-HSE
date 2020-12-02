@@ -141,6 +141,39 @@ void ttt::Two_thee_tree::remove(int key)
 }
 
 /*
+ * Get next node after node
+ * with given key
+ * params:
+ *          key - given key
+ * return:
+ *          node after given key
+ *          if there is node after given key
+ *          else nullptr. If there is no node
+ *          with given key - return nullptr
+ */
+std::shared_ptr<Node> Two_thee_tree::next(int key)
+{
+    return get(key,right);
+}
+
+/*
+ * Get next node after node
+ * with given key
+ * params:
+ *          key - given key
+ * return:
+ *          node before given key
+ *          if there is node before given key
+ *          else nullptr. If there is no node
+ *          with given key - return nullptr
+ */
+std::shared_ptr<Node> Two_thee_tree::prev(int key)
+{
+    return get(key,left);
+}
+
+
+/*
  * Search by given key
  * params:
  *          key - given key
@@ -278,6 +311,7 @@ void ttt::Two_thee_tree::add_and_balance(const std::shared_ptr<ttt::Node> parent
     update_childs_max(parent);
 }
 
+
 /*
  * Return node
  * which is closest neighbor
@@ -287,7 +321,7 @@ void ttt::Two_thee_tree::add_and_balance(const std::shared_ptr<ttt::Node> parent
  * return:
  *          closets neighbor of given node
  */
-std::shared_ptr<ttt::Node> ttt::Two_thee_tree::find_nearest_brother(std::shared_ptr<ttt::Node> node)
+std::shared_ptr<ttt::Node> ttt::Two_thee_tree::find_nearest_brother(std::shared_ptr<ttt::Node> node, Mode mode)
 {
     // If parent is most left node for grand parent ->
     //            closest brother is in the right
@@ -300,10 +334,67 @@ std::shared_ptr<ttt::Node> ttt::Two_thee_tree::find_nearest_brother(std::shared_
     auto node_pos = std::distance(node->parent->childs.begin(),
         std::find(node->parent->childs.begin(),node->parent->childs.end(),
                   node));
-    auto pos_nn = (node_pos + 1 == node->parent->childs.size())?
+
+    if (mode == some)
+    {
+        auto pos_nn = (node_pos + 1 == node->parent->childs.size())?
                                                                        node_pos - 1:
                                                                        node_pos + 1;
-    return node->parent->childs[pos_nn];
+        return node->parent->childs[pos_nn];
+    }
+
+    if (mode == right)
+        return (node_pos + 1 == node->parent->childs.size())? nullptr : node->parent->childs[node_pos+1];
+    if (mode == left)
+        return (node_pos > 0)? node->parent->childs[node_pos-1] : nullptr;
+
+
+}
+
+/*
+ * Get next or prev node by key
+ * depend on given direction
+ * params:
+ *          key - given key
+ *          direction - given direction
+ * return:
+ *          node before/after given key
+ *          if there is node before/after given key
+ *          else nullptr. If there is no node
+ *          with given key - return nullptr
+ */
+std::shared_ptr<Node> Two_thee_tree::get(int key, Mode direction)
+{
+        auto node = search(key);
+        if(node == nullptr || node->is_null)
+            return nullptr;
+       // Go up untill find node
+       // which have right brother
+       auto parent = node->parent;
+       std::shared_ptr<Node> brother;
+       do
+       {
+           brother = find_nearest_brother(node,direction);
+           parent = node->parent;
+           node = parent;
+       }
+       while(parent != nullptr && brother == nullptr);
+
+       // If there is no right brother at all
+       // thus there is no next node
+       if(parent == nullptr && brother == nullptr)
+           return nullptr;
+       // Else go to the left
+       // until leaf
+       while(brother->childs.size())
+       {
+           if(direction == right)
+               brother = brother->childs[0];
+            else // if direction == left
+               brother = brother->childs.back();
+       }
+       // The leaf will be next
+       return brother;
 }
 
 

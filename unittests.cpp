@@ -2,6 +2,7 @@
 #include "two_three_tree.h"
 #include <cstdlib>
 #include <algorithm>
+#include <set>
 #include "quick_sort.h"
 #include "sweep_line.h"
 
@@ -110,6 +111,41 @@ TEST(TTTtreeTest, remove_test)
         for(auto &x: v1)
             tree.remove(x);
         canonic_tree_test(tree);
+    }
+
+}
+
+TEST(TTTtreeTest,next_pred_test)
+{
+
+    const int ITER = 10;
+    int min(-100000), max(100000);
+    auto tree = ttt::Two_thee_tree();
+    for(int i=0; i < ITER; i++)
+    {
+
+        // Create random vector
+        auto v = std::vector<int>(10000);
+        std::generate(v.begin(), v.end(),
+                      [min, max]() -> int {return std::rand() % (max - min) + min; });
+        // Push it into tree
+        for(auto &x : v)
+            tree.insert(x,nullptr);
+
+        // Sort and remove unique elemns
+        std::sort( v.begin(), v.end() );
+        v.erase( std::unique( v.begin(), v.end() ), v.end() );
+
+        // Assign order in tree
+        for(auto x = v.begin()+1; (x + 1) != v.end(); ++x)
+        {
+            EXPECT_EQ(tree.next(*x)->key,*(x+1));
+            EXPECT_EQ(tree.prev(*x)->key,*(x-1));
+        }
+        EXPECT_EQ(tree.next(v.back()),nullptr);
+        EXPECT_EQ(tree.prev(v[0]),nullptr);
+
+        tree =  ttt::Two_thee_tree();
     }
 
 }

@@ -65,9 +65,10 @@ struct Node: std::enable_shared_from_this<Node>
 
     bool update_child_max();
     void change_childs(std::vector<std::shared_ptr<Node>>&& childs_);
+    bool is_leaf(){return !childs.size();}
 };
 
-
+enum Mode {left, right, some};
 class Two_thee_tree
 {
 
@@ -82,12 +83,15 @@ public:
 
      void insert(int key, std::shared_ptr<Segment> value);
      void remove(int key);
+     std::shared_ptr<Node> next(int key);
+     std::shared_ptr<Node> prev(int key);
      std::shared_ptr<Node> search(int key);
 
 private:
      void update_childs_max(const std::shared_ptr<Node> node);
      void add_and_balance(const std::shared_ptr<Node> parent_p, const std::shared_ptr<Node> node);
-     std::shared_ptr<Node> find_nearest_brother(std::shared_ptr<Node> node);
+     std::shared_ptr<Node> find_nearest_brother(std::shared_ptr<Node> node, Mode mode = some);
+     std::shared_ptr<Node> get(int key,Mode direction);
 };
 
 }
