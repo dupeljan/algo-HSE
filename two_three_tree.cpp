@@ -247,7 +247,7 @@ std::shared_ptr<Node> ttt::Two_thee_tree::search(double key)
 
    // Return null if key is not equal
    // else return x
-   if(x->key == key)
+   if(std::abs(x->key - key) < EPS)
        return x;
    return std::shared_ptr<ttt::Node>(new Node(x,true));
 }
