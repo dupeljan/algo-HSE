@@ -8,20 +8,20 @@
 
 void canonic_tree_test(ttt::Two_thee_tree tree)
 {
-    EXPECT_EQ (tree.root->child_max,std::vector<int>({4,9}));
-    EXPECT_EQ (tree.root->childs[0]->child_max,std::vector<int>({-1,2,4}));
-    EXPECT_EQ (tree.root->childs[1]->child_max,std::vector<int>({6,9}));
-    EXPECT_EQ (tree.root->childs[0]->childs[0]->child_max,std::vector<int>({-2,-1}));
-    EXPECT_EQ (tree.root->childs[0]->childs[1]->child_max,std::vector<int>({1,2}));
-    EXPECT_EQ (tree.root->childs[0]->childs[2]->child_max,std::vector<int>({3,4}));
+    EXPECT_EQ (tree.root->child_max,std::vector<double>({4,9}));
+    EXPECT_EQ (tree.root->childs[0]->child_max,std::vector<double>({-1,2,4}));
+    EXPECT_EQ (tree.root->childs[1]->child_max,std::vector<double>({6,9}));
+    EXPECT_EQ (tree.root->childs[0]->childs[0]->child_max,std::vector<double>({-2,-1}));
+    EXPECT_EQ (tree.root->childs[0]->childs[1]->child_max,std::vector<double>({1,2}));
+    EXPECT_EQ (tree.root->childs[0]->childs[2]->child_max,std::vector<double>({3,4}));
     EXPECT_EQ (tree.root->childs[0]->childs[0]->childs[0]->key,-2);
     EXPECT_EQ (tree.root->childs[0]->childs[0]->childs[1]->key,-1);
     EXPECT_EQ (tree.root->childs[0]->childs[1]->childs[0]->key,1);
     EXPECT_EQ (tree.root->childs[0]->childs[1]->childs[1]->key,2);
     EXPECT_EQ (tree.root->childs[0]->childs[2]->childs[0]->key,3);
     EXPECT_EQ (tree.root->childs[0]->childs[2]->childs[1]->key,4);
-    EXPECT_EQ (tree.root->childs[1]->childs[0]->child_max,std::vector<int>({5,6}));
-    EXPECT_EQ (tree.root->childs[1]->childs[1]->child_max,std::vector<int>({7,8,9}));
+    EXPECT_EQ (tree.root->childs[1]->childs[0]->child_max,std::vector<double>({5,6}));
+    EXPECT_EQ (tree.root->childs[1]->childs[1]->child_max,std::vector<double>({7,8,9}));
     EXPECT_EQ (tree.root->childs[1]->childs[0]->childs[0]->key,5);
     EXPECT_EQ (tree.root->childs[1]->childs[0]->childs[1]->key,6);
     EXPECT_EQ (tree.root->childs[1]->childs[1]->childs[0]->key,7);
@@ -34,7 +34,7 @@ TEST(TTTtreeTest, insert_test)
 {
 
     auto tree = ttt::Two_thee_tree();
-    auto canonic_tree_insert = std::vector<int>({3,2,1,4,5,6,7,8,9,-1,-2});
+    auto canonic_tree_insert = std::vector<double>({3,2,1,4,5,6,7,8,9,-1,-2});
     // Insert something to this tree
     for(auto &i : canonic_tree_insert)
         tree.insert(i,nullptr);
@@ -63,7 +63,7 @@ TEST(TTTtreeTest, remove_test)
     EXPECT_EQ(tree.root,nullptr);
 
     // Parent has tree elelents case
-    auto canonic_tree_insert = std::vector<int>({3,2,1,4,5,6,7,8,9,-1,-2});
+    auto canonic_tree_insert = std::vector<double>({3,2,1,4,5,6,7,8,9,-1,-2});
     for (auto &i : canonic_tree_insert)
         tree.insert(i,nullptr);
     tree.insert(-3,nullptr);
@@ -90,15 +90,15 @@ TEST(TTTtreeTest, remove_test)
     int min(10), max(10000);
     for(int i=0; i<10; i++)
     {
-        auto v1 = std::vector<int>(10000);
-        auto v2 = std::vector<int>(10000);
+        auto v1 = std::vector<double>(10000);
+        auto v2 = std::vector<double>(10000);
         std::generate(v1.begin(), v1.end(),
-                      [min, max]() -> int {return std::rand() % (max - min) + min; });
+                      [min, max]() -> double {return std::rand() % (max - min) + min; });
         auto tmp = max;
         max = -min;
         min = -tmp;
         std::generate(v2.begin(), v2.end(),
-                      [max, min]() -> int {return std::rand() % (max - min) + min; });
+                      [max, min]() -> double {return std::rand() % (max - min) + min; });
         v1.insert( v1.end(), v2.begin(), v2.end() );
 
         std::random_shuffle(v1.begin(),v1.end());
@@ -125,9 +125,9 @@ TEST(TTTtreeTest,next_pred_test)
     {
 
         // Create random vector
-        auto v = std::vector<int>(10000);
+        auto v = std::vector<double>(10000);
         std::generate(v.begin(), v.end(),
-                      [min, max]() -> int {return std::rand() % (max - min) + min; });
+                      [min, max]() -> double {return std::rand() % (max - min) + min; });
         // Push it into tree
         for(auto &x : v)
             tree.insert(x,nullptr);

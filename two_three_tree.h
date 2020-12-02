@@ -12,12 +12,13 @@
 
 namespace ttt {
 
+const double EPS(1e-5);
 
 struct Node: std::enable_shared_from_this<Node>
 {
-    int key; // Node key
+    double key; // Node key
     std::shared_ptr<Segment> value; // Node value
-    std::vector<int> child_max; // Maximum element key in child subtree
+    std::vector<double> child_max; // Maximum element key in child subtree
     std::vector<std::shared_ptr<Node>> childs; // Ordered vector of childs
     std::shared_ptr<Node> parent;
     bool is_null;
@@ -27,7 +28,7 @@ struct Node: std::enable_shared_from_this<Node>
     is_null(false)
     {}
 
-    Node(std::vector<int> child_max_p,
+    Node(std::vector<double> child_max_p,
          std::vector<std::shared_ptr<Node>> childs_p,
                             std::shared_ptr<Node> parent_p):
     key(-1),
@@ -37,7 +38,7 @@ struct Node: std::enable_shared_from_this<Node>
     is_null(false)
     {}
 
-    Node(int key_p,std::shared_ptr<Segment> value_p):
+    Node(double key_p,std::shared_ptr<Segment> value_p):
     key(key_p),
     value(value_p),
     child_max({}),
@@ -46,7 +47,7 @@ struct Node: std::enable_shared_from_this<Node>
     is_null(false)
     {}
 
-    Node(int key_p,std::shared_ptr<Segment> value_p, std::shared_ptr<Node> parent_p):
+    Node(double key_p,std::shared_ptr<Segment> value_p, std::shared_ptr<Node> parent_p):
     key(key_p),
     value(value_p),
     child_max({}),
@@ -81,17 +82,17 @@ public:
         root = nullptr;
      }
 
-     void insert(int key, std::shared_ptr<Segment> value);
-     void remove(int key);
-     std::shared_ptr<Node> next(int key);
-     std::shared_ptr<Node> prev(int key);
-     std::shared_ptr<Node> search(int key);
+     void insert(double key, std::shared_ptr<Segment> value);
+     void remove(double key);
+     std::shared_ptr<Node> next(double key);
+     std::shared_ptr<Node> prev(double key);
+     std::shared_ptr<Node> search(double key);
 
 private:
      void update_childs_max(const std::shared_ptr<Node> node);
      void add_and_balance(const std::shared_ptr<Node> parent_p, const std::shared_ptr<Node> node);
      std::shared_ptr<Node> find_nearest_brother(std::shared_ptr<Node> node, Mode mode = some);
-     std::shared_ptr<Node> get(int key,Mode direction);
+     std::shared_ptr<Node> get(double key,Mode direction);
 };
 
 }
