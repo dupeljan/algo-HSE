@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include "quick_sort.h"
+#include "sweep_line.h"
 
 void canonic_tree_test(ttt::Two_thee_tree tree)
 {
@@ -35,7 +36,7 @@ TEST(TTTtreeTest, insert_test)
     auto canonic_tree_insert = std::vector<int>({3,2,1,4,5,6,7,8,9,-1,-2});
     // Insert something to this tree
     for(auto &i : canonic_tree_insert)
-        tree.insert(i);
+        tree.insert(i,nullptr);
 
     canonic_tree_test(tree);
 
@@ -55,7 +56,7 @@ TEST(TTTtreeTest, remove_test)
     tree.remove(5);
 
     // Only root case
-    tree.insert(5);
+    tree.insert(5,nullptr);
     tree.remove(5);
     tree.remove(5);
     EXPECT_EQ(tree.root,nullptr);
@@ -63,20 +64,20 @@ TEST(TTTtreeTest, remove_test)
     // Parent has tree elelents case
     auto canonic_tree_insert = std::vector<int>({3,2,1,4,5,6,7,8,9,-1,-2});
     for (auto &i : canonic_tree_insert)
-        tree.insert(i);
-    tree.insert(-3);
+        tree.insert(i,nullptr);
+    tree.insert(-3,nullptr);
     tree.remove(-3);
     canonic_tree_test(tree);
 
     auto tree1 = ttt::Two_thee_tree();
-    tree1.insert(1);
-    tree1.insert(1);
-    tree1.insert(2);
+    tree1.insert(1,nullptr);
+    tree1.insert(1,nullptr);
+    tree1.insert(2,nullptr);
     tree1.remove(1);
     EXPECT_EQ(tree1.root->key,2);
     EXPECT_EQ(tree1.root->parent,nullptr);
 
-    tree.insert(-3);
+    tree.insert(-3,nullptr);
     for (auto &i : canonic_tree_insert)
         tree.remove(i);
     EXPECT_EQ(tree.root->key,-3);
@@ -84,7 +85,7 @@ TEST(TTTtreeTest, remove_test)
 
     // HARD TEST
     for (auto &i : canonic_tree_insert)
-        tree.insert(i);
+        tree.insert(i,nullptr);
     int min(10), max(10000);
     for(int i=0; i<10; i++)
     {
@@ -101,7 +102,7 @@ TEST(TTTtreeTest, remove_test)
 
         std::random_shuffle(v1.begin(),v1.end());
         for(auto &x : v1)
-            tree.insert(x);
+            tree.insert(x,nullptr);
         std::random_shuffle(v1.begin(),v1.end());
         for(auto &x : v1)
             EXPECT_EQ(tree.search(x)->key,x);
@@ -122,14 +123,28 @@ TEST(QuicksortTest, sort_test)
 
     for(int i = 0; i < 100; i++)
     {
-        std::vector<int> v(10000);
+        std::vector<std::pair<double,int>> v(10000);
         // Fill it with random numbers
         std::generate(v.begin(), v.end(),
-                      [min, max]() -> int {return std::rand() % (max - min) + min; });
+                      [min, max]() -> std::pair<double,int> {return std::make_pair(std::rand() % (max - min) + min,0); });
         // Sort it and assert
-        quick_sort(v);
-        EXPECT_EQ(std::is_sorted(v.begin(),v.end()),true) ;
+        quick_sort<int>(v);
+        EXPECT_EQ(is_sorted<int>(v),true) ;
     }
+}
+
+TEST(SegmentTest, intersection_test)
+{
+    using namespace sweep_line;
+    // Parallel lines
+    Segment a(Point(1,2),Point(3,2));
+    Segment b(Point(0,4),Point(10,4));
+    EXPECT_EQ(a*b,false);
+    // Intercept lines
+    Segment c(Point(0,0),Point(4,50));
+    EXPECT_EQ(b*c,true);
+    // Not intercept but not parallel
+    EXPECT_EQ(a*c,false);
 }
 
 int main(int argc, char **argv) {

@@ -3,51 +3,22 @@
 
 #include <algorithm>
 #include <utility>
+#include <memory>
+#include <vector>
+#include "quick_sort.h"
+#include "two_three_tree.h"
+#include "segment.h"
+
+namespace sweep_line {
+
 
 class Sweep_line
 {
-    /*
-     * Segment class
-     */
-   struct Point
-   {
-       double x,y;
-
-       Point():
-       x(0),
-       y(0)
-       {}
-
-       Point(double x_p, double y_p):
-       x(x_p),
-       y(y_p)
-       {}
-   };
-
-   class Segment
-   {
-    // Start point
-    Point start;
-    // End point
-    Point end;
-    // Segment slope
-    Point a;
-    public:
-       Segment(T start, T end)
-       {
-           if(start.x > end.x)
-               std::swap(start,end);
-           double a = (b.y - a.y) / (double) (b.x - a.x);
-       }
-
-       // True if lines intercept
-       bool operator*(const Segment& rhs)
-       {
-
-       }
-   };
+    std::vector<Segment> v;
 public:
     Sweep_line();
+    std::unique_ptr<std::pair<Segment,Segment>> get_first_interception();
 };
 
+}
 #endif // SWEEP_LINE_H

@@ -8,12 +8,15 @@
 #include <algorithm>
 #include <utility>
 #include <exception>
+#include "segment.h"
 
 namespace ttt {
+
 
 struct Node: std::enable_shared_from_this<Node>
 {
     int key; // Node key
+    std::shared_ptr<Segment> value; // Node value
     std::vector<int> child_max; // Maximum element key in child subtree
     std::vector<std::shared_ptr<Node>> childs; // Ordered vector of childs
     std::shared_ptr<Node> parent;
@@ -34,16 +37,18 @@ struct Node: std::enable_shared_from_this<Node>
     is_null(false)
     {}
 
-    Node(int key_p):
+    Node(int key_p,std::shared_ptr<Segment> value_p):
     key(key_p),
+    value(value_p),
     child_max({}),
     childs({}),
     parent(nullptr),
     is_null(false)
     {}
 
-    Node(int key_p, std::shared_ptr<Node> parent_p):
+    Node(int key_p,std::shared_ptr<Segment> value_p, std::shared_ptr<Node> parent_p):
     key(key_p),
+    value(value_p),
     child_max({}),
     childs({}),
     parent(parent_p),
@@ -75,7 +80,7 @@ public:
         root = nullptr;
      }
 
-     void insert(int key);
+     void insert(int key, std::shared_ptr<Segment> value);
      void remove(int key);
      std::shared_ptr<Node> search(int key);
 

@@ -8,7 +8,9 @@ add_executable(${PROJECT_NAME}
     two_three_tree.h
     two_three_tree.cpp
     sweep_line.h
-    sweep_line.cpp)
+    sweep_line.cpp
+    segment.h
+)
 
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -23,6 +25,7 @@ add_executable(runUnitTests
     two_three_tree.cpp
     sweep_line.h
     sweep_line.cpp
+    segment.h
 )
 
 target_link_libraries(runUnitTests gtest gtest_main Threads::Threads)

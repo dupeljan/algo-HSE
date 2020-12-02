@@ -1,16 +1,17 @@
 #include "two_three_tree.h"
 
+using namespace ttt;
 /*
  * Insert element in tree with
  * given key value
  * params:
  *          key - given key value
  */
-void ttt::Two_thee_tree::insert(int key)
+void ttt::Two_thee_tree::insert(int key,std::shared_ptr<Segment> value)
 {
     if(root == nullptr)
     {
-        root = std::shared_ptr<ttt::Node>(new ttt::Node(key));
+        root = std::shared_ptr<ttt::Node>(new ttt::Node(key,value));
         return;
     }
 
@@ -29,7 +30,7 @@ void ttt::Two_thee_tree::insert(int key)
         auto root_new = std::shared_ptr<ttt::Node>(new ttt::Node());
         root->parent = root_new;
         auto left_child = root;
-        auto right_child = std::shared_ptr<ttt::Node>(new ttt::Node(key, root_new));
+        auto right_child = std::shared_ptr<ttt::Node>(new ttt::Node(key,value, root_new));
         if(x->key > key)
         {
             std::swap(left_child,right_child);
@@ -44,7 +45,7 @@ void ttt::Two_thee_tree::insert(int key)
     }
 
     // Insert element
-    auto elem_new = std::shared_ptr<ttt::Node>(new ttt::Node(key));
+    auto elem_new = std::shared_ptr<ttt::Node>(new ttt::Node(key,value));
     // Make child list correct
     add_and_balance(parent,elem_new);
 
@@ -147,7 +148,7 @@ void ttt::Two_thee_tree::remove(int key)
  *          node if it's exist
  *          or left node with params is_null == true
  */
-std::shared_ptr<ttt::Node> ttt::Two_thee_tree::search(int key)
+std::shared_ptr<Node> ttt::Two_thee_tree::search(int key)
 {
     if (root == nullptr)
         return nullptr;
