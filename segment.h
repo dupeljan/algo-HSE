@@ -3,13 +3,15 @@
 
 #include <stdexcept>
 #include <math.h>
+#include <functional>
 
 const double EPS(1e-5);
 
-bool cmp_eq(const double a, const double b)
+const auto cmp_eq =
+[](const double a, const double b) -> bool
 {
     return std::abs(b - a) < EPS;
-}
+};
 
 
 /*

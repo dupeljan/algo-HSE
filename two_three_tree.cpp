@@ -31,7 +31,7 @@ void ttt::Two_thee_tree::insert(key_type key, std::shared_ptr<Segment> value)
         root->parent = root_new;
         auto left_child = root;
         auto right_child = std::shared_ptr<ttt::Node>(new ttt::Node(key,value, root_new));
-        if(x->key - key > EPS)
+        if(key < x->key)
         {
             std::swap(left_child,right_child);
 
