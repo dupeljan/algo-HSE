@@ -3,8 +3,9 @@
 #include <cstdlib>
 #include <algorithm>
 #include <set>
-#include "quick_sort.h"
 #include "sweep_line.h"
+
+using namespace ttt;
 
 void canonic_tree_test(ttt::Two_thee_tree tree)
 {
@@ -34,7 +35,7 @@ TEST(TTTtreeTest, insert_test)
 {
 
     auto tree = ttt::Two_thee_tree();
-    auto canonic_tree_insert = std::vector<double>({3,2,1,4,5,6,7,8,9,-1,-2});
+    auto canonic_tree_insert = std::vector<key_type>({3,2,1,4,5,6,7,8,9,-1,-2});
     // Insert something to this tree
     for(auto &i : canonic_tree_insert)
         tree.insert(i,nullptr);
@@ -63,7 +64,7 @@ TEST(TTTtreeTest, remove_test)
     EXPECT_EQ(tree.root,nullptr);
 
     // Parent has tree elelents case
-    auto canonic_tree_insert = std::vector<double>({3,2,1,4,5,6,7,8,9,-1,-2});
+    auto canonic_tree_insert = std::vector<key_type>({3,2,1,4,5,6,7,8,9,-1,-2});
     for (auto &i : canonic_tree_insert)
         tree.insert(i,nullptr);
     tree.insert(-3,nullptr);
@@ -90,15 +91,15 @@ TEST(TTTtreeTest, remove_test)
     int min(10), max(10000);
     for(int i=0; i<10; i++)
     {
-        auto v1 = std::vector<double>(10000);
-        auto v2 = std::vector<double>(10000);
+        auto v1 = std::vector<key_type>(10000);
+        auto v2 = std::vector<key_type>(10000);
         std::generate(v1.begin(), v1.end(),
-                      [min, max]() -> double {return std::rand() % (max - min) + min; });
+                      [min, max]() -> key_type {return std::rand() % (max - min) + min; });
         auto tmp = max;
         max = -min;
         min = -tmp;
         std::generate(v2.begin(), v2.end(),
-                      [max, min]() -> double {return std::rand() % (max - min) + min; });
+                      [max, min]() -> key_type {return std::rand() % (max - min) + min; });
         v1.insert( v1.end(), v2.begin(), v2.end() );
 
         std::random_shuffle(v1.begin(),v1.end());
@@ -125,9 +126,9 @@ TEST(TTTtreeTest,next_pred_test)
     {
 
         // Create random vector
-        auto v = std::vector<double>(10000);
+        auto v = std::vector<key_type>(10000);
         std::generate(v.begin(), v.end(),
-                      [min, max]() -> double {return std::rand() % (max - min) + min; });
+                      [min, max]() -> key_type {return std::rand() % (max - min) + min; });
         // Push it into tree
         for(auto &x : v)
             tree.insert(x,nullptr);
@@ -169,6 +170,7 @@ TEST(QuicksortTest, sort_test)
     }
 }
 
+
 TEST(SegmentTest, intersection_test)
 {
     using namespace sweep_line;
@@ -183,6 +185,19 @@ TEST(SegmentTest, intersection_test)
     EXPECT_EQ(a*c,false);
 }
 
+/*
+TEST(Sweep_lineTest,get_frist_interception_test)
+{
+    using namespace sweep_line;
+    // Gen vector of segments
+    seg_vect v;
+    v.push_back(Segment(Point(0,0),Point(5,1)));
+    v.push_back(Segment(Point(1,-1),Point(5,-3)));
+    v.push_back(Segment(Point(2,0),Point(3,4)));
+    auto res =  Sweep_line::get_first_interception(v);
+    EXPECT_EQ(res == nullptr,false);
+}
+*/
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

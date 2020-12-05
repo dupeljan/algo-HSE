@@ -10,14 +10,18 @@
 #include <exception>
 #include "segment.h"
 
-namespace ttt {
+namespace ttt
+{
 
-const double EPS(1e-5);
+typedef double key_type;
+typedef std::shared_ptr<Segment> val_type;
 
 struct Node: std::enable_shared_from_this<Node>
 {
-    double key; // Node key
-    std::shared_ptr<Segment> value; // Node value
+    static std::shared_ptr<Segment> get_value_shrd_ptr(std::shared_ptr<Node> n);
+
+    key_type key; // Node key
+    val_type value; // Node value
     std::vector<double> child_max; // Maximum element key in child subtree
     std::vector<std::shared_ptr<Node>> childs; // Ordered vector of childs
     std::shared_ptr<Node> parent;
@@ -28,7 +32,7 @@ struct Node: std::enable_shared_from_this<Node>
     is_null(false)
     {}
 
-    Node(std::vector<double> child_max_p,
+    Node(std::vector<key_type> child_max_p,
          std::vector<std::shared_ptr<Node>> childs_p,
                             std::shared_ptr<Node> parent_p):
     key(-1),
@@ -38,7 +42,7 @@ struct Node: std::enable_shared_from_this<Node>
     is_null(false)
     {}
 
-    Node(double key_p,std::shared_ptr<Segment> value_p):
+    Node(key_type key_p,val_type value_p):
     key(key_p),
     value(value_p),
     child_max({}),
@@ -47,7 +51,7 @@ struct Node: std::enable_shared_from_this<Node>
     is_null(false)
     {}
 
-    Node(double key_p,std::shared_ptr<Segment> value_p, std::shared_ptr<Node> parent_p):
+    Node(key_type key_p,val_type value_p, std::shared_ptr<Node> parent_p):
     key(key_p),
     value(value_p),
     child_max({}),
@@ -82,17 +86,17 @@ public:
         root = nullptr;
      }
 
-     void insert(double key, std::shared_ptr<Segment> value);
-     void remove(double key);
-     std::shared_ptr<Node> next(double key);
-     std::shared_ptr<Node> prev(double key);
-     std::shared_ptr<Node> search(double key);
+     void insert(key_type key, std::shared_ptr<Segment> value);
+     void remove(key_type key);
+     std::shared_ptr<Node> next(key_type key);
+     std::shared_ptr<Node> prev(key_type key);
+     std::shared_ptr<Node> search(key_type key);
 
 private:
      void update_childs_max(const std::shared_ptr<Node> node);
      void add_and_balance(const std::shared_ptr<Node> parent_p, const std::shared_ptr<Node> node);
      std::shared_ptr<Node> find_nearest_brother(std::shared_ptr<Node> node, Mode mode = some);
-     std::shared_ptr<Node> get(double key,Mode direction);
+     std::shared_ptr<Node> get(key_type key,Mode direction);
 };
 
 }

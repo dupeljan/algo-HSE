@@ -7,7 +7,7 @@ using namespace ttt;
  * params:
  *          key - given key value
  */
-void ttt::Two_thee_tree::insert(double key,std::shared_ptr<Segment> value)
+void ttt::Two_thee_tree::insert(key_type key, std::shared_ptr<Segment> value)
 {
     if(root == nullptr)
     {
@@ -57,7 +57,7 @@ void ttt::Two_thee_tree::insert(double key,std::shared_ptr<Segment> value)
  * params:
  *          key - given key value
  */
-void ttt::Two_thee_tree::remove(double key)
+void ttt::Two_thee_tree::remove(key_type key)
 {
     // Find node to remove
     auto t = search(key);
@@ -151,7 +151,7 @@ void ttt::Two_thee_tree::remove(double key)
  *          else nullptr. If there is no node
  *          with given key - return nullptr
  */
-std::shared_ptr<Node> Two_thee_tree::next(double key)
+std::shared_ptr<Node> Two_thee_tree::next(key_type key)
 {
     return get(key,right);
 }
@@ -167,7 +167,7 @@ std::shared_ptr<Node> Two_thee_tree::next(double key)
  *          else nullptr. If there is no node
  *          with given key - return nullptr
  */
-std::shared_ptr<Node> Two_thee_tree::prev(double key)
+std::shared_ptr<Node> Two_thee_tree::prev(key_type key)
 {
     return get(key,left);
 }
@@ -184,7 +184,7 @@ std::shared_ptr<Node> Two_thee_tree::prev(double key)
  *          else nullptr. If there is no node
  *          with given key - return nullptr
  */
-std::shared_ptr<Node> Two_thee_tree::get(double key, Mode direction)
+std::shared_ptr<Node> Two_thee_tree::get(key_type key, Mode direction)
 {
         auto node = search(key);
         if(node == nullptr || node->is_null)
@@ -226,7 +226,7 @@ std::shared_ptr<Node> Two_thee_tree::get(double key, Mode direction)
  *          node if it's exist
  *          or left node with params is_null == true
  */
-std::shared_ptr<Node> ttt::Two_thee_tree::search(double key)
+std::shared_ptr<Node> ttt::Two_thee_tree::search(key_type key)
 {
     if (root == nullptr)
         return nullptr;
@@ -239,15 +239,15 @@ std::shared_ptr<Node> ttt::Two_thee_tree::search(double key)
    while(x->childs.size())
    {
        if(x->childs.size() == 2)
-           x = (key - x->child_max[0] <= EPS)? x->childs[0] : x->childs[1];
+           x = (key  <= x->child_max[0])? x->childs[0] : x->childs[1];
        else // x child size == 3
-           x = (key - x->child_max[0] <= EPS)? x->childs[0] :
-               ( (key - x->child_max[1] <= EPS)? x->childs[1] : x->childs[2] );
+           x = (key <= x->child_max[0] )? x->childs[0] :
+               ( (key <= x->child_max[1] )? x->childs[1] : x->childs[2] );
    }
 
    // Return null if key is not equal
    // else return x
-   if(std::abs(x->key - key) < EPS)
+   if(x->key == key)
        return x;
    return std::shared_ptr<ttt::Node>(new Node(x,true));
 }
@@ -285,8 +285,8 @@ void ttt::Two_thee_tree::add_and_balance(const std::shared_ptr<ttt::Node> parent
     if (parent->childs.size() == 2)
     {
         // Just add another one and return
-        int child_place = (key - parent->child_max[0] < EPS)? 0
-                                    : ((key - parent->child_max[1] < EPS)? 1 : 2);
+        int child_place = (key <  parent->child_max[0] )? 0
+                                    : ((key <  parent->child_max[1])? 1 : 2);
         parent->childs.insert(parent->childs.begin() + child_place, node);
         // Update children max
         //parent->child_max.insert(parent->child_max.begin()+child_place, key);
@@ -296,9 +296,9 @@ void ttt::Two_thee_tree::add_and_balance(const std::shared_ptr<ttt::Node> parent
     }
 
     // Find palce and add element
-    int child_place = (key - parent->child_max[0] < EPS)? 0
-                               : ((key - parent->child_max[1] < EPS)? 1
-                                   : (((key - parent->child_max[2] < EPS)? 2 : 3)));
+    int child_place = (key < parent->child_max[0])? 0
+                               : ((key < parent->child_max[1] )? 1
+                                   : (((key < parent->child_max[2])? 2 : 3)));
 
     parent->childs.insert(parent->childs.begin() + child_place, node);
     parent->child_max.insert(parent->child_max.begin()+child_place, key);
@@ -433,4 +433,9 @@ void ttt::Node::change_childs(std::vector<std::shared_ptr<Node>> &&childs_)
         childs.push_back(std::shared_ptr<Node>(ch));
         ch->parent = ref;
     }
+}
+
+std::shared_ptr<Segment> Node::get_value_shrd_ptr(std::shared_ptr<Node> n)
+{
+    return (n == nullptr)? nullptr : n->value;
 }

@@ -1,11 +1,23 @@
 #ifndef SEGMENT_H
 #define SEGMENT_H
 
+#include <stdexcept>
+#include <math.h>
+
+const double EPS(1e-5);
+
+bool cmp_eq(const double a, const double b)
+{
+    return std::abs(b - a) < EPS;
+}
+
+
 /*
  * Segment class
  */
 struct Point
 {
+
    double x,y;
 
    Point():
@@ -17,8 +29,38 @@ struct Point
    x(x_p),
    y(y_p)
    {}
+
+   bool operator == (const Point& rhs)
+   {
+       return cmp_eq(x,rhs.x) && cmp_eq(y,rhs.y);
+   }
 };
 
+/*
+ * Key of ttt tree struct
+ * Content begin x and slope value
+ */
+struct ttt_key
+{
+    Point beg;
+    double slope;
+
+    bool operator<(const ttt_key& rhs)
+    {
+        // rhs begin x have to be >= this key begin x
+        if(this->beg.x > rhs.beg.x)
+            throw std::invalid_argument( "Right point have to have bigger x arg" );
+        return this->beg.y + (rhs.beg.x - this->beg.x) * this->slope - rhs.beg.y < EPS;
+    }
+
+    bool operator == (const ttt_key& rhs)
+    {
+        return (this->beg == rhs.beg && cmp_eq(slope,rhs.slope));
+    }
+    bool operator <= (const ttt_key& rhs){return (*this) == rhs || (*this) < rhs;}
+    //bool operator >= (const ttt_key& rhs){return  rhs <= (*this);}
+    //bool operator >  (const ttt_key& rhs){return rhs < (*this);}
+};
 
 struct Segment
 {
@@ -65,6 +107,11 @@ bool intersect (Point a, Point b, Point c, Point d)
    bool operator*(const Segment& rhs)
    {
         return intersect(a,b,rhs.a,rhs.b);
+   }
+
+   bool operator *(std::shared_ptr<Segment> rhs)
+   {
+       return (rhs == nullptr)? false : (*this) * (*rhs.get());
    }
 };
 

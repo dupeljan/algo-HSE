@@ -7,17 +7,19 @@
 #include <vector>
 #include "quick_sort.h"
 #include "two_three_tree.h"
-#include "segment.h"
 
 namespace sweep_line {
 
+typedef std::pair<Segment,Segment> seg_pair;
+typedef std::vector<Segment> seg_vect;
 
 class Sweep_line
 {
-    std::vector<Segment> v;
+    //std::vector<Segment> v;
 public:
     Sweep_line();
-    std::unique_ptr<std::pair<Segment,Segment>> get_first_interception();
+    static seg_pair* get_first_interception(const seg_vect segment_vect);
+    static seg_vect gen_segments(int count);
 };
 
 }
