@@ -13,7 +13,7 @@
 namespace ttt
 {
 
-typedef double key_type;
+typedef ttt_key key_type;
 typedef std::shared_ptr<Segment> val_type;
 
 struct Node: std::enable_shared_from_this<Node>
@@ -22,20 +22,18 @@ struct Node: std::enable_shared_from_this<Node>
 
     key_type key; // Node key
     val_type value; // Node value
-    std::vector<double> child_max; // Maximum element key in child subtree
+    std::vector<key_type> child_max; // Maximum element key in child subtree
     std::vector<std::shared_ptr<Node>> childs; // Ordered vector of childs
     std::shared_ptr<Node> parent;
     bool is_null;
 
     Node():
-    key(-1),
     is_null(false)
     {}
 
     Node(std::vector<key_type> child_max_p,
          std::vector<std::shared_ptr<Node>> childs_p,
                             std::shared_ptr<Node> parent_p):
-    key(-1),
     child_max(child_max_p),
     childs(childs_p),
     parent(parent_p),

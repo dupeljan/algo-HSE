@@ -27,7 +27,7 @@ seg_pair *Sweep_line::get_first_interception(const seg_vect segment_vect)
     for(auto &event : events_queue)
     {
         auto cur_segment_ptr = event.second.segment;
-        auto key = cur_segment_ptr->a.y;
+        auto key = cur_segment_ptr->key;
 
         switch (event.second.get_status())
         {

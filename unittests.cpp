@@ -6,7 +6,7 @@
 #include "sweep_line.h"
 
 using namespace ttt;
-
+/*
 void canonic_tree_test(ttt::Two_thee_tree tree)
 {
     EXPECT_EQ (tree.root->child_max,std::vector<double>({4,9}));
@@ -150,6 +150,8 @@ TEST(TTTtreeTest,next_pred_test)
     }
 
 }
+*/
+
 
 TEST(QuicksortTest, sort_test)
 {
@@ -185,19 +187,43 @@ TEST(SegmentTest, intersection_test)
     EXPECT_EQ(a*c,false);
 }
 
-/*
+TEST(SegmentTest, complex_copmarison_test)
+{
+     using namespace ttt;
+     Segment a(Point(1,2),Point(4,5));
+     EXPECT_EQ(a.key == a.key,true);
+     Segment b(Point(2,4),Point(3,5));
+     Segment c(Point(2,-1),Point(4,-2));
+     EXPECT_EQ(a.key < b.key, true);
+     EXPECT_EQ(c.key < a.key, true);
+
+}
+
+
 TEST(Sweep_lineTest,get_frist_interception_test)
 {
     using namespace sweep_line;
     // Gen vector of segments
+    {
     seg_vect v;
     v.push_back(Segment(Point(0,0),Point(5,1)));
     v.push_back(Segment(Point(1,-1),Point(5,-3)));
     v.push_back(Segment(Point(2,0),Point(3,4)));
-    auto res =  Sweep_line::get_first_interception(v);
-    EXPECT_EQ(res == nullptr,false);
+    auto res =  *Sweep_line::get_first_interception(v);
+    EXPECT_EQ(res,std::make_pair(Segment(Point(2,0),Point(3,4)),Segment(Point(0,0),Point(5,1))));
+    }
+
+    {
+    seg_vect v;
+    v.push_back(Segment(Point(0,0),Point(5,1)));
+    v.push_back(Segment(Point(2,0),Point(3,-4)));
+    v.push_back(Segment(Point(1,-1),Point(5,-3)));
+    auto res =  *Sweep_line::get_first_interception(v);
+    EXPECT_EQ(res,std::make_pair(Segment(Point(2,0),Point(3,-4)),Segment(Point(1,-1),Point(5,-3))));
+    }
+
 }
-*/
+
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

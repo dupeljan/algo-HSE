@@ -406,9 +406,9 @@ bool ttt::Node::update_child_max()
     auto childs_max_old = child_max;
     // If child is a leaf
     auto value = (!childs[0]->childs.size())?
-                [](Node x) -> double {return x.key;} : // just save key
+                [](Node x) -> key_type {return x.key;} : // just save key
                 ///ERROR HERE
-                [](Node x) -> double {
+                [](Node x) -> key_type {
         return *std::max_element(x.child_max.begin(),x.child_max.end());}; // else save the max of child_max list
 
     child_max.clear();
