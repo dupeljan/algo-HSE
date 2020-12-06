@@ -21,7 +21,7 @@ long run(std::function<seg_pair*(const seg_vect)> f,seg_vect inp)
 
 int main()
 {
-    auto test_cont = {100, 300, 500,1000, 2000,5000,50000,100000,200000};
+    auto test_cont = {100, 300, 500,1000, 2000,5000,10000,30000};
     int attempts = 3;
     auto sweep_line = sweep_line::Sweep_line::get_first_interception;
     auto straightforward = sweep_line::Sweep_line::get_first_interception_staidforward;
