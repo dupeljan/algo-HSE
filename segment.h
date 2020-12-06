@@ -7,10 +7,28 @@
 
 const double EPS(1e-5);
 
+// Ask somebody why it isn't work
+// without labmda
 const auto cmp_eq =
 [](const double a, const double b) -> const bool
 {
     return std::abs(b - a) < EPS;
+};
+
+const auto get_rand_unique_vector =
+[](const long size,const long min = -1000000,const long max =1000000) -> std::vector<long>
+{
+    auto v = std::vector<long>(size);
+    std::generate(v.begin(), v.end(),
+                  [min, max]() -> long {return std::rand() % (max - min) + min; });
+    v.erase(std::unique(v.begin(), v.end() ), v.end());
+    return v;
+};
+
+const auto get_rand_long =
+[](const long min = -1000000, const long max = 1000000) -> long
+{
+    return std::rand() % (max - min) + min;
 };
 
 
@@ -71,6 +89,11 @@ struct ttt_key
     //bool operator >  (const ttt_key& rhs){return rhs < (*this);}
 };
 
+// True if lines intercept
+struct Segment;
+
+const bool operator*(const Segment& lhs,const Segment& rhs);
+
 struct Segment
 {
 // Start point
@@ -82,12 +105,12 @@ double slope;
 // Segment key
 ttt_key key;
 
-inline int area (Point a, Point b, Point c)
+static const int area (Point a, Point b, Point c)
 {
     return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
 }
 
-inline bool intersect_1 (int a, int b, int c, int d)
+static const bool intersect_1 (int a, int b, int c, int d)
 {
     if (a > b)  std::swap(a, b);
     if (c > d)  std::swap(c, d);
@@ -95,7 +118,7 @@ inline bool intersect_1 (int a, int b, int c, int d)
 }
 
 
-bool intersect (Point a, Point b, Point c, Point d)
+static const bool intersect (const Point a,const Point b,const Point c,const Point d)
 {
     return intersect_1 (a.x, b.x, c.x, d.x)
         && intersect_1 (a.y, b.y, c.y, d.y)
@@ -107,6 +130,13 @@ Point get_a() const { return a; }
 Point  get_b() const{ return b; }
 
     Segment()
+    {}
+
+    Segment(const Segment& s):
+    a(s.a),
+    b(s.b),
+    slope(s.slope),
+    key(s.key)
     {}
 
    Segment(Point start,Point end):
@@ -121,18 +151,24 @@ Point  get_b() const{ return b; }
        key.end = b;
        key.slope = slope;
    }
-
+/*
    // True if lines intercept
    const bool operator*(const Segment& rhs)
    {
         return intersect(a,b,rhs.a,rhs.b);
    }
-
+*/
    const bool operator *(std::shared_ptr<Segment> rhs)
    {
        return (rhs == nullptr)? false : (*this) * (*rhs.get());
    }
 };
+
+inline const bool operator*(const Segment& lhs,const Segment& rhs)
+{
+     return Segment::intersect(lhs.a,lhs.b,rhs.a,rhs.b);
+}
+
 
 inline const bool operator == (const Segment& lhs,const Segment& rhs)
 {

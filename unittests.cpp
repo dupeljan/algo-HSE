@@ -1,5 +1,4 @@
 #include "gtest/gtest.h"
-#include "two_three_tree.h"
 #include <cstdlib>
 #include <algorithm>
 #include <set>
@@ -206,14 +205,7 @@ TEST(SegmentTest, complex_copmarison_test)
 
 }
 
-std::vector<long> get_rand_unique(const int size,long min = -1000000,long max =1000000)
-{
-    auto v = std::vector<long>(size);
-    std::generate(v.begin(), v.end(),
-                  [min, max]() -> long {return std::rand() % (max - min) + min; });
-    v.erase(std::unique(v.begin(), v.end() ), v.end());
-    return v;
-}
+
 
 TEST(Sweep_lineTest,get_frist_interception_simple_cases)
 {
@@ -248,9 +240,9 @@ TEST(Sweep_lineTest,get_frist_interception_test_parallel_line)
     for(int i = 0; i < count; i++)
     {
         seg_vect v;
-        auto x = get_rand_unique(1000000);
-        auto y = get_rand_unique(1000000);
-        auto len = get_rand_unique(1000000);
+        auto x = get_rand_unique_vector(1000000);
+        auto y = get_rand_unique_vector(1000000);
+        auto len = get_rand_unique_vector(1000000);
         double slope = 30 * (std::rand() % 1000 ) / (double) 1000.;
 
         // Add only parallel lines
@@ -290,10 +282,10 @@ TEST(Sweep_lineTest,get_frist_interception_test_random_non_interception)
     for(int i = 0; i < count; i++)
     {
         seg_vect v;
-        auto x1 = get_rand_unique(1000000);
-        auto y1 = get_rand_unique(1000000);
-        auto x2 = get_rand_unique(1000000);
-        auto y2 = get_rand_unique(1000000);
+        auto x1 = get_rand_unique_vector(1000000);
+        auto y1 = get_rand_unique_vector(1000000);
+        auto x2 = get_rand_unique_vector(1000000);
+        auto y2 = get_rand_unique_vector(1000000);
         auto sizes = {x1.size(),x2.size(),y1.size(),y2.size()};
 
 
@@ -332,10 +324,10 @@ TEST(Sweep_lineTest,get_frist_interception_test_random_one_interception)
     for(int i = 0; i < count; i++)
     {
         seg_vect v;
-        auto x1 = get_rand_unique(1000000);//(5,0,10);
-        auto y1 = get_rand_unique(1000000);//(5,0,10);
-        auto x2 = get_rand_unique(1000000);//(5,0,10);
-        auto y2 = get_rand_unique(1000000);//(5,0,10);
+        auto x1 = get_rand_unique_vector(1000000);//(5,0,10);
+        auto y1 = get_rand_unique_vector(1000000);//(5,0,10);
+        auto x2 = get_rand_unique_vector(1000000);//(5,0,10);
+        auto y2 = get_rand_unique_vector(1000000);//(5,0,10);
         auto sizes = {x1.size(),x2.size(),y1.size(),y2.size()};
 
         Segment intercept[2];

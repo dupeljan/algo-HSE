@@ -61,7 +61,78 @@ seg_pair *Sweep_line::get_first_interception(const seg_vect segment_vect)
     return nullptr;
 }
 
-seg_vect Sweep_line::gen_segments(int count)
+/*
+ * Straidforward algotithm for
+ * first interception search
+ */
+seg_pair *Sweep_line::get_first_interception_staidforward(const seg_vect segment_vect)
 {
-
+    for(int i = 0; i < segment_vect.size(); i++)
+        for(int j = 0; j < i; j++)
+            if(segment_vect[i] * segment_vect[j])
+                return new seg_pair(segment_vect[i],segment_vect[j]);
+    return nullptr;
 }
+
+/*
+ * Gen segment list with
+ * at least one interception if such mode givem
+ * params:
+ *          count - size of segments which algo trying to add
+ * return:
+ *          pair:
+ *             first - result segment vector
+ *             second - segment, which intercept others and have to be
+ *                      in the output of get_first_interception
+ *                      if mode == one_iterception
+ *                      else nullptr
+ */
+std::pair<seg_vect, std::unique_ptr<Segment>> Sweep_line::gen_segments(long count, Gen_mode mode)
+{
+     seg_vect v;
+
+     auto gen_rand_segment =
+     [](long len = 3) -> Segment
+     {
+        long x1(get_rand_long()),y1(get_rand_long());
+        long slope = get_rand_long() % 300;
+             return Segment(Point(x1,y1),Point(x1+len,y1+len * slope));
+     };
+
+     auto is_intercept =
+             [](Segment seg,seg_vect v) -> bool
+     {
+           bool res = true;
+           for(auto &x : v)
+               if(x * seg)
+               {
+                   res = false;
+                   break;
+               }
+           return res;
+     };
+
+     auto k = 0;
+     while (k < count)
+     {
+          auto seg = gen_rand_segment();
+          if(is_intercept(seg,v))
+          {
+            k++;
+            v.push_back(seg);
+          }
+      }
+
+     if(mode == one_iterception)
+     {
+        Segment seg;
+        do
+        {
+         seg = gen_rand_segment();
+        }while(!is_intercept(seg,v));
+        v.push_back(seg);
+        return std::make_pair(v,std::make_unique<Segment>(Segment(seg)));
+     }
+     return std::make_pair(v,nullptr);
+}
+

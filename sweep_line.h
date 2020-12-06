@@ -13,13 +13,16 @@ namespace sweep_line {
 typedef std::pair<Segment,Segment> seg_pair;
 typedef std::vector<Segment> seg_vect;
 
+enum Gen_mode {without_interceptions, one_iterception};
 class Sweep_line
 {
+
     //std::vector<Segment> v;
 public:
     Sweep_line();
     static seg_pair* get_first_interception(const seg_vect segment_vect);
-    static seg_vect gen_segments(int count);
+    static seg_pair* get_first_interception_staidforward(const seg_vect segment_vect);
+    static std::pair<seg_vect, std::unique_ptr<Segment> > gen_segments(long count = 20000, Gen_mode mode = without_interceptions );
 };
 
 }
