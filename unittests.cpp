@@ -162,10 +162,11 @@ TEST(QuicksortTest, sort_test)
 
     for(int i = 0; i < 100; i++)
     {
-        std::vector<std::pair<double,int>> v(10000);
+        std::vector<std::pair<Segment_part_key,int>> v(10000);
         // Fill it with random numbers
         std::generate(v.begin(), v.end(),
-                      [min, max]() -> std::pair<double,int> {return std::make_pair(std::rand() % (max - min) + min,0); });
+                      [min, max]() -> std::pair<Segment_part_key,int> {return std::make_pair(Segment_part_key(std::rand() % (max - min) + min,
+                                                            start),0); });
         // Sort it and assert
         quick_sort<int>(v);
         EXPECT_EQ(is_sorted<int>(v),true) ;
@@ -197,33 +198,193 @@ TEST(SegmentTest, complex_copmarison_test)
      EXPECT_EQ(a.key < b.key, true);
      EXPECT_EQ(c.key < a.key, true);
 
+     // Infinity test
+     Segment d(Point(1,3),Point(1,4));
+     Segment e(Point(1,4),Point(1,3));
+     EXPECT_EQ(d,d);
+     EXPECT_EQ(e,e);
+
 }
 
+std::vector<long> get_rand_unique(const int size,long min = -1000000,long max =1000000)
+{
+    auto v = std::vector<long>(size);
+    std::generate(v.begin(), v.end(),
+                  [min, max]() -> long {return std::rand() % (max - min) + min; });
+    v.erase(std::unique(v.begin(), v.end() ), v.end());
+    return v;
+}
 
-TEST(Sweep_lineTest,get_frist_interception_test)
+TEST(Sweep_lineTest,get_frist_interception_simple_cases)
 {
     using namespace sweep_line;
     // Gen vector of segments
     {
-    seg_vect v;
-    v.push_back(Segment(Point(0,0),Point(5,1)));
-    v.push_back(Segment(Point(1,-1),Point(5,-3)));
-    v.push_back(Segment(Point(2,0),Point(3,4)));
-    auto res =  *Sweep_line::get_first_interception(v);
-    EXPECT_EQ(res,std::make_pair(Segment(Point(2,0),Point(3,4)),Segment(Point(0,0),Point(5,1))));
+        seg_vect v;
+        v.push_back(Segment(Point(0,0),Point(5,1)));
+        v.push_back(Segment(Point(1,-1),Point(5,-3)));
+        v.push_back(Segment(Point(2,0),Point(3,4)));
+        auto res =  *Sweep_line::get_first_interception(v);
+        EXPECT_EQ(res,std::make_pair(Segment(Point(2,0),Point(3,4)),Segment(Point(0,0),Point(5,1))));
     }
 
     {
-    seg_vect v;
-    v.push_back(Segment(Point(0,0),Point(5,1)));
-    v.push_back(Segment(Point(2,0),Point(3,-4)));
-    v.push_back(Segment(Point(1,-1),Point(5,-3)));
-    auto res =  *Sweep_line::get_first_interception(v);
-    EXPECT_EQ(res,std::make_pair(Segment(Point(2,0),Point(3,-4)),Segment(Point(1,-1),Point(5,-3))));
+        seg_vect v;
+        v.push_back(Segment(Point(0,0),Point(5,1)));
+        v.push_back(Segment(Point(2,0),Point(3,-4)));
+        v.push_back(Segment(Point(1,-1),Point(5,-3)));
+        auto res =  *Sweep_line::get_first_interception(v);
+        EXPECT_EQ(res,std::make_pair(Segment(Point(2,0),Point(3,-4)),Segment(Point(1,-1),Point(5,-3))));
     }
+}
+TEST(Sweep_lineTest,get_frist_interception_test_parallel_line)
+{
+    using namespace sweep_line;
+
+    std::cout << "Size of non intercept lines\nAll lines parallel\n";
+    // Build list of parallel segment
+    const int count = 30;
+
+    for(int i = 0; i < count; i++)
+    {
+        seg_vect v;
+        auto x = get_rand_unique(1000000);
+        auto y = get_rand_unique(1000000);
+        auto len = get_rand_unique(1000000);
+        double slope = 30 * (std::rand() % 1000 ) / (double) 1000.;
+
+        // Add only parallel lines
+        int k = 0;
+        for(int i = 0; i < std::min(std::min(x.size(),y.size()),len.size()); i++)
+        {
+            auto seg = Segment(Point(x[i],y[i]),Point(x[i]+len[i],y[i] + len[i] * slope));
+            auto k_old = k;
+            for(auto &seg_v : v)
+                if(seg_v * seg)
+                {
+                    k++;
+                    break;
+                }
+            if(k_old == k)
+                v.push_back(seg);
+        }
+        std::cout << v.size() << '\n';
+        auto res = Sweep_line::get_first_interception(v);
+        if (res != nullptr)
+        {
+            std::cout << "Test is broken or algo is bad!\n";
+            EXPECT_EQ(res->first * res->second,true);
+        }
+    }
+
+
 
 }
 
+TEST(Sweep_lineTest,get_frist_interception_test_random_non_interception)
+{
+    using namespace sweep_line;
+    const int count = 30;
+
+    std::cout << "----Pure random------\n";
+    for(int i = 0; i < count; i++)
+    {
+        seg_vect v;
+        auto x1 = get_rand_unique(1000000);
+        auto y1 = get_rand_unique(1000000);
+        auto x2 = get_rand_unique(1000000);
+        auto y2 = get_rand_unique(1000000);
+        auto sizes = {x1.size(),x2.size(),y1.size(),y2.size()};
+
+
+        int k = 0;
+        for(int i = 0; i < *std::min(sizes.begin(),sizes.end()); i++)
+        {
+            auto seg = Segment(Point(x1[i],y1[i]),Point(x2[i],y2[i]));
+            auto k_old = k;
+            for(auto &seg_v : v)
+                if(seg_v * seg)
+                {
+                    k++;
+                    break;
+                }
+            if(k_old == k)
+                v.push_back(seg);
+        }
+        std::cout << v.size() << '\n';
+        auto res = Sweep_line::get_first_interception(v);
+        if (res != nullptr)
+        {
+            std::cout << "Test is broken or algo is bad!\n";
+            EXPECT_EQ(res->first * res->second,true);
+        }
+
+     }
+}
+TEST(Sweep_lineTest,get_frist_interception_test_random_one_interception)
+{
+    using namespace sweep_line;
+
+    const int count = 30;
+
+    // Add one interception to this list
+    std::cout << "----Pure random with one interception------\n";
+    for(int i = 0; i < count; i++)
+    {
+        seg_vect v;
+        auto x1 = get_rand_unique(1000000);//(5,0,10);
+        auto y1 = get_rand_unique(1000000);//(5,0,10);
+        auto x2 = get_rand_unique(1000000);//(5,0,10);
+        auto y2 = get_rand_unique(1000000);//(5,0,10);
+        auto sizes = {x1.size(),x2.size(),y1.size(),y2.size()};
+
+        Segment intercept[2];
+        int k = 0;
+        for(int i = 0; i < *std::min(sizes.begin(),sizes.end()); i++)
+        {
+            auto seg = Segment(Point(x1[i],y1[i]),Point(x2[i],y2[i]));
+            auto k_old = k;
+            for(auto &seg_v : v)
+                if(seg_v * seg)
+                {
+                    if(!k)
+                    {
+                        intercept[0] = seg;// Remember it
+                        intercept[1] = seg_v;
+                    }
+
+
+                    k++;
+                    break;
+                }
+            if(k_old == k || k == 1)
+                v.push_back(seg);
+        }
+        std::cout << v.size() << '\n';
+        auto res = Sweep_line::get_first_interception(v);
+        // If there is no interceptions
+        // Almost impossible
+        if(!k)
+        {
+            EXPECT_EQ(res,nullptr);
+            continue;
+        }
+
+        // Algo must find that interception
+        EXPECT_EQ(std::find(v.begin(),v.end(),intercept[0]) == v.end(),false);
+        EXPECT_EQ(std::find(v.begin(),v.end(),intercept[1]) == v.end(),false);
+        EXPECT_EQ(intercept[0] * intercept[1], true);
+
+        EXPECT_EQ(res == nullptr,false);
+        if(res == nullptr)
+            continue;
+        EXPECT_EQ(res->first == intercept[0]
+               || res->second == intercept[0],true);
+
+     }
+
+
+}
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

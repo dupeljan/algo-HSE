@@ -1,11 +1,12 @@
 #ifndef QUICK_SORT_H
 #define QUICK_SORT_H
 #include <math.h>
+#include "segment.h"
 
 template<class T>
-void quick_sort(std::vector<std::pair<double,T>> &v);
+void quick_sort(std::vector<std::pair<Segment_part_key,T>> &v);
 template<class T>
-int partitision_rand(std::vector<std::pair<double,T>> &v, int p, int r);
+int partitision_rand(std::vector<std::pair<Segment_part_key,T>> &v, int p, int r);
 
 
 /*
@@ -18,9 +19,9 @@ int partitision_rand(std::vector<std::pair<double,T>> &v, int p, int r);
  *              else false
  */
 template<class T>
-bool cmp(std::pair<double,T> a, std::pair<double,T> b,double eps = 1e-5)
+bool cmp(std::pair<Segment_part_key,T> a, std::pair<Segment_part_key,T> b,double eps = 1e-5)
 {
-    return b.first - a.first > eps;
+    return a.first < b.first;
 }
 
 /*
@@ -32,7 +33,7 @@ bool cmp(std::pair<double,T> a, std::pair<double,T> b,double eps = 1e-5)
  *  r - right bound of vector
  */
 template<class T>
-void quick_sort(std::vector<std::pair<double,T>> &v, int p, int r)
+void quick_sort(std::vector<std::pair<Segment_part_key,T>> &v, int p, int r)
 {
     if(r <= p)
         return;
@@ -43,7 +44,7 @@ void quick_sort(std::vector<std::pair<double,T>> &v, int p, int r)
 }
 
 template<class T>
-void quick_sort(std::vector<std::pair<double,T>> &v)
+void quick_sort(std::vector<std::pair<Segment_part_key,T>> &v)
 {
     quick_sort(v,0, v.size() - 1);
 }
@@ -62,7 +63,7 @@ void quick_sort(std::vector<std::pair<double,T>> &v)
  *  int - index of element partited by
  */
 template<class T>
-int partitision_rand(std::vector<std::pair<double,T>> &v, int p, int r)
+int partitision_rand(std::vector<std::pair<Segment_part_key, T> > &v, int p, int r)
 {
     // Random element choice
     auto i_rand = std::rand() % (r - p + 1) + p;
@@ -72,7 +73,7 @@ int partitision_rand(std::vector<std::pair<double,T>> &v, int p, int r)
     int i = p - 1;
     for(int j = p; j < r; j++ )
     {
-        if (cmp(v[j], x))
+        if (cmp(v[j],x))
         {
             i++;
             std::swap(v[i], v[j]);
@@ -91,7 +92,7 @@ int partitision_rand(std::vector<std::pair<double,T>> &v, int p, int r)
  *  bool - result of the test
  */
 template<class T>
-bool is_sorted(std::vector<std::pair<double,T>> v)
+bool is_sorted(std::vector<std::pair<Segment_part_key,T>> v)
 {
     bool res = true;
     for(auto x = v.begin(); (x+1) != v.end() && res; x++)

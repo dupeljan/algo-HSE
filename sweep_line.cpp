@@ -9,7 +9,7 @@ seg_pair *Sweep_line::get_first_interception(const seg_vect segment_vect)
 {
     using namespace ttt;
     // Make events queue
-    std::vector<std::pair<double,Segment_part>> events_queue;
+    std::vector<std::pair<Segment_part_key,Segment_part>> events_queue;
     for(auto segment : segment_vect)
     {
         auto ptr = std::make_shared<Segment>(segment);

@@ -44,7 +44,7 @@ struct Point
  */
 struct ttt_key
 {
-    Point beg;
+    Point beg,end;
     double slope;
 
     const bool operator<(const ttt_key& rhs)
@@ -64,7 +64,7 @@ struct ttt_key
 
     const bool operator == (const ttt_key& rhs)
     {
-        return (this->beg == rhs.beg && cmp_eq(slope,rhs.slope));
+        return (this->beg == rhs.beg && this->end == rhs.end);
     }
     const bool operator <= (const ttt_key& rhs){return (*this) == rhs || (*this) < rhs;}
     //bool operator >= (const ttt_key& rhs){return  rhs <= (*this);}
@@ -117,7 +117,8 @@ Point  get_b() const{ return b; }
            std::swap(a,b);
        slope = (b.y - a.y) / (double) (b.x - a.x);
 
-       key.beg = start;
+       key.beg = a;
+       key.end = b;
        key.slope = slope;
    }
 
@@ -142,6 +143,40 @@ inline const bool operator == (const Segment& lhs,const Segment& rhs)
 enum Status {start, end};
 static const Status All_statuses[] = {start, end};
 
+// Key which takes into accout
+// status of segment part
+// start < end if
+// start coord is equal
+struct Segment_part_key
+{
+    double key;
+    Status status;
+
+    Segment_part_key()
+    {
+    }
+
+    Segment_part_key(Segment segment, Status status_p)
+    {
+        status = status_p;
+        key = (status == start)? segment.a.x : segment.b.x;
+    }
+
+    Segment_part_key(double key_p, Status status_p):
+    status(status_p),
+    key(key_p)
+    {
+    }
+
+    const bool operator <( const Segment_part_key& rhs)
+    {
+        if (cmp_eq(key,rhs.key))
+            return status == start &&  rhs.status == end;
+        return key - rhs.key < EPS;
+     }
+};
+
+
 class Segment_part
 {
     Status status;
@@ -154,6 +189,9 @@ public:
     {}
 
     Status get_status(){return status;}
-    double get_key(){ return (status == start)? segment->a.x : segment->b.x;}
+    Segment_part_key get_key(){ return Segment_part_key(*segment.get(),status);}
 };
+
+
+
 #endif // SEGMENT_H
